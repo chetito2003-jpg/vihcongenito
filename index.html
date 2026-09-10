@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIH Congénito: Edición Arcade (Full)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a0b14;
+            --pink-main: #ff007f;
+            --pink-light: #ff66b2;
+            --pink-dark: #99004c;
+            --text-color: #ffe6f2;
+            --neon-glow: 0 0 10px var(--pink-main), 0 0 20px var(--pink-main);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--pink-main);
+            text-align: center;
+            text-shadow: 2px 2px 0px var(--pink-dark);
+            line-height: 1.5;
+        }
+        h1 { font-size: 24px; margin-bottom: 30px; text-shadow: var(--neon-glow); }
+        h2 { font-size: 16px; margin-top: 20px; color: var(--pink-light); }
+        h4 { font-size: 14px; text-align: left; color: var(--pink-light); margin-bottom: 10px; }
+        
+        .arcade-container {
+            border: 4px solid var(--pink-main);
+            box-shadow: inset 0 0 15px var(--pink-main), 0 0 15px var(--pink-main);
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: #26111e;
+            padding: 20px;
+        }
+
+        /* Sistema de Pestañas */
+        .tab-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--pink-dark);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background-color: var(--bg-color);
+            color: var(--pink-light);
+            border: 2px solid var(--pink-dark);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .tab-btn:hover, .tab-btn.active {
+            background-color: var(--pink-main);
+            color: white;
+            border-color: var(--pink-light);
+            box-shadow: var(--neon-glow);
+        }
+
+        .tab-content { display: none; padding: 15px; animation: fadeIn 0.5s; line-height: 1.4; }
+        .tab-content.active { display: block; }
+
+        /* Estilos de cuadrícula e imágenes */
+        .grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start; margin-top: 20px;}
+        .pixel-img {
+            width: 100%;
+            border: 4px solid var(--pink-main);
+            image-rendering: pixelated;
+            box-shadow: 4px 4px 0px var(--pink-dark);
+        }
+
+        /* Tarjetas interactivas para pasos y ciclos */
+        .card-container { display: flex; gap: 15px; justify-content: space-between; flex-wrap: wrap; margin-top: 20px;}
+        .interactive-card {
+            background-color: var(--pink-dark);
+            border: 2px solid var(--pink-light);
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+        .interactive-card:hover {
+            background-color: var(--pink-main);
+            transform: translateY(-5px);
+            box-shadow: var(--neon-glow);
+        }
+        .interactive-card h3 { color: white; font-size: 12px; text-align: left; }
+
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: rgba(0,0,0,0.3); }
+        th, td { border: 1px solid var(--pink-dark); padding: 15px; text-align: left; vertical-align: top; }
+        th { background-color: var(--pink-dark); color: white; font-family: 'Press Start 2P', cursive; font-size: 10px; }
+
+        /* Minijuego */
+        #game-board {
+            background-color: #000;
+            border: 4px solid var(--pink-light);
+            padding: 20px;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .game-btn {
+            background-color: var(--pink-dark);
+            color: white;
+            border: 2px solid var(--pink-light);
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            width: 90%;
+            margin-left: auto; margin-right: auto;
+        }
+        .game-btn:hover { background-color: var(--pink-main); }
+        #score-display { font-family: 'Press Start 2P', cursive; font-size: 12px; color: yellow; margin-bottom: 20px; }
+
+        ul { margin-left: 20px; }
+        li { margin-bottom: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="arcade-container">
+    <h1>VIH CONGÉNITO: EDICIÓN CLÍNICA</h1>
+
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">1. PATOGENIA</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">2. MICROBIOLOGÍA</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab3')">3. TRANSMISIÓN</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab4')">4. DIAGNÓSTICO Y ALGORITMOS</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab5')">5. PREVENCIÓN Y EPIDEMIOLOGÍA</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab6')">6. ARCADE QUIZ</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab7')">REFERENCIAS</button>
+    </div>
+
+    <!-- Pestaña 1: Patogenia -->
+    <div id="tab1" class="tab-content active">
+        <h2>1. Definición y Patogenia</h2>
+        <div class="grid-2">
+            <div>
+                <p>El VIH congénito se define como la infección por el virus adquirida mediante la transmisión maternoinfantil[cite: 3]. Es fundamental distinguir que la exposición neonatal no equivale necesariamente a una infección establecida; sin embargo, requiere un seguimiento riguroso según los protocolos de salud pública[cite: 3].</p>
+                <p>El virus presenta un tropismo específico hacia las células que expresan el receptor CD4, tales como los linfocitos T CD4+, macrófagos y células dendríticas[cite: 3]. En ausencia de intervención terapéutica, la replicación viral sostenida provoca una depleción progresiva de estos linfocitos, lo que deriva en un deterioro inmunológico severo y, eventualmente, en el desarrollo del Síndrome de Inmunodeficiencia Adquirida (SIDA) MedlinePlus[cite: 3].</p>
+            </div>
+            <div>
+                <img src="https://placehold.co/400x300/ff007f/ffe6f2?text=Insertar+Pixel+Art\nPatogenia" alt="Patogenia" class="pixel-img">
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 2: Microbiología -->
+    <div id="tab2" class="tab-content">
+        <h2>2. Microbiología y Replicación Viral</h2>
+        <p>El VIH es un retrovirus cuyo material genético está constituido por ARN de cadena sencilla[cite: 3]. Su ciclo biológico es complejo y constituye el blanco de la terapia farmacológica actual[cite: 3]:</p>
+        
+        <div class="card-container">
+            <div class="interactive-card">
+                <h3>ENTRADA</h3>
+                <p>Se inicia con la unión de las glicoproteínas virales a los receptores CD4 y correceptores celulares (CCR5 o CXCR4)[cite: 3].</p>
+            </div>
+            <div class="interactive-card">
+                <h3>TRANSCRIPCIÓN REVERSA</h3>
+                <p>La enzima transcriptasa reversa convierte el ARN viral en ADN de doble cadena[cite: 3].</p>
+            </div>
+            <div class="interactive-card">
+                <h3>INTEGRACIÓN</h3>
+                <p>La enzima integrasa incorpora este ADN viral, ahora denominado provirus, en el genoma de la célula huésped[cite: 3].</p>
+            </div>
+            <div class="interactive-card">
+                <h3>MADURACIÓN</h3>
+                <p>El proceso finaliza con la transcripción del ADN proviral, el ensamblaje de nuevos viriones y su gemación, lo que compromete la viabilidad de la célula infectada[cite: 3].</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 3: Transmisión -->
+    <div id="tab3" class="tab-content">
+        <h2>3. Mecanismos de Transmisión</h2>
+        <p>La transmisión vertical puede ocurrir en tres etapas críticas, cada una con factores de riesgo asociados[cite: 3]:</p>
+        
+        <table>
+            <tr>
+                <th>Etapa de Transmisión</th>
+                <th>Descripción Técnica</th>
+            </tr>
+            <tr>
+                <td>Intrauterina (Gestación)</td>
+                <td>El virus atraviesa la barrera placentaria[cite: 3]. El riesgo se correlaciona directamente con cargas virales maternas elevadas[cite: 3].</td>
+            </tr>
+            <tr>
+                <td>Intraparto (Parto)</td>
+                <td>Representa la vía más común (60-75% de los casos sin intervención) debido al contacto con sangre y secreciones vaginales durante el canal de parto[cite: 3].</td>
+            </tr>
+            <tr>
+                <td>Posnatal (Lactancia)</td>
+                <td>El virus se excreta en la leche materna[cite: 3]. La exposición prolongada puede incrementar el riesgo de infección hasta en un 29%[cite: 3].</td>
+            </tr>
+        </table>
+        
+        <div class="grid-2">
+            <div>
+                <p><strong>Factores de Riesgo Determinantes:</strong> Elevada carga viral materna, ausencia de Terapia Antirretroviral (TAR), diagnóstico tardío durante el embarazo, parto vaginal no planificado e infecciones agudas recientes en la madre[cite: 3].</p>
+            </div>
+            <div>
+                <img src="https://placehold.co/400x300/ff66b2/1a0b14?text=Insertar+Pixel+Art\nTransmision" alt="Transmisión" class="pixel-img">
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 4: Diagnóstico y Algoritmos -->
+    <div id="tab4" class="tab-content">
+        <h2>4. Diagnóstico de Laboratorio (Enfoque Pediátrico)</h2>
+        <p>El diagnóstico en neonatos y lactantes difiere significativamente del adulto debido a la transferencia transplacentaria de anticuerpos maternos (IgG)[cite: 3].</p>
+        
+        <h4>Limitaciones de la Serología</h4>
+        <p>Las pruebas convencionales (ELISA de 4ta generación) no son diagnósticas en menores de 18 meses, ya que los anticuerpos maternos pueden persistir y generar resultados falsos positivos por inmunidad pasiva[cite: 3].</p>
+        
+        <h4>Técnicas de Amplificación de Ácidos Nucleicos (NAT)</h4>
+        <p>Para confirmar la infección en pediatría, es imperativo el uso de técnicas virológicas directas[cite: 3]:</p>
+        <ul>
+            <li><strong>PCR para ADN Proviral:</strong> Técnica de elección que detecta el genoma integrado en los leucocitos mononucleares[cite: 3].</li>
+            <li><strong>PCR para ARN Viral (Carga Viral):</strong> Cuantifica el ARN plasmático tras una conversión a ADNc mediante transcriptasa reversa[cite: 3].</li>
+            <li><strong>Detección de Antígeno p24:</strong> Aunque es útil, su sensibilidad es inferior a las pruebas moleculares en la población infantil[cite: 3].</li>
+            <li><strong>Muestreo en Papel Filtro (DBS):</strong> Facilita la logística de transporte y conservación de muestras para análisis molecular en centros especializados[cite: 3].</li>
+        </ul>
+
+        <h2>5. Algoritmo de Testeo y Serorreversión</h2>
+        <p>El seguimiento clínico del lactante expuesto se rige por un cronograma estricto de pruebas moleculares Panel on Antiretroviral Therapy and Medical Management of Children Living with HIV[cite: 3]:</p>
+        <ul>
+            <li><strong>Primera fase:</strong> Toma de muestra entre los 14 y 21 días de vida[cite: 3].</li>
+            <li><strong>Segunda fase:</strong> Evaluación entre el primer y segundo mes[cite: 3].</li>
+            <li><strong>Fase final:</strong> Control entre los 4 y 5 meses de edad[cite: 3].</li>
+        </ul>
+        <p>Para la exclusión formal del VIH, se requieren dos resultados de PCR negativos: uno obtenido después del primer mes de vida y el segundo después del cuarto mes[cite: 3]. La serorreversión ocurre cuando los anticuerpos maternos desaparecen (proceso que puede durar hasta 18 meses), confirmando la condición de seronegatividad en el niño no infectado[cite: 3].</p>
+
+        <h2>Algoritmo Diagnóstico Pediátrico (Tiempos de Testeo)</h2>
+        <p>Para establecer un diagnóstico certero o descartar la infección, los laboratorios y el personal clínico deben seguir algoritmos de tiempo muy estrictos utilizando pruebas virológicas (NAT), ya que las pruebas serológicas de 4ta o 5ta generación no son útiles en lactantes debido a la transferencia de anticuerpos maternos[cite: 3].</p>
+        <ul>
+            <li><strong>Esquema para lactantes no amamantados:</strong> Se recomiendan pruebas virológicas (detección de ARN o ADN mediante PCR) en tres momentos clave[cite: 3]: Entre los 14 y 21 días de vida[cite: 3]. Entre 1 y 2 meses de edad[cite: 3]. Entre los 4 y 6 meses de edad[cite: 3].</li>
+            <li><strong>Esquema para lactantes amamantados:</strong> Dado que la exposición es continua, el monitoreo virológico debe ser más estricto[cite: 3]. Las pruebas se realizan al nacer, a los 14-21 días, a los 1-2 meses y a los 4-6 meses[cite: 3].</li>
+            <li><strong>Exclusión definitiva del VIH:</strong> Para descartar por completo la infección en un lactante que no recibe lactancia materna, se requieren al menos dos pruebas virológicas negativas: una realizada a partir del primer mes de vida y otra a partir del cuarto mes[cite: 3].</li>
+            <li><strong>Uso de pruebas de antígeno/anticuerpo:</strong> El uso de inmunoensayos (ELISA) se reserva únicamente para niños mayores de 18 a 24 meses, edad en la que los anticuerpos maternos (IgG) ya han sido eliminados del torrente sanguíneo del niño[cite: 3].</li>
+        </ul>
+    </div>
+
+    <!-- Pestaña 5: Prevención y Epidemiología -->
+    <div id="tab5" class="tab-content">
+        <h2>6. Prevención y Tratamiento Antirretroviral</h2>
+        <p>La implementación de estrategias integrales ha logrado reducir la transmisión vertical a niveles inferiores al 1% en diversos contextos clínicos León-Leal, 2014[cite: 3]:</p>
+        <ul>
+            <li><strong>Prevención Primaria:</strong> Tamizaje universal en embarazadas, inicio precoz de TAR materna para alcanzar carga viral indetectable y sustitución de la lactancia materna por fórmulas de inicio[cite: 3].</li>
+            <li><strong>Profilaxis Post-Exposición (Lactante):</strong> Inicio de medicación antirretroviral preferentemente en las primeras 6 a 12 horas postparto[cite: 3].</li>
+            <li><strong>Esquemas Terapéuticos Pediátricos:</strong> Se utilizan combinaciones de inhibidores nucleósidos de la transcriptasa inversa (ITIN) como Zidovudina (ZDV) y Lamivudina (3TC), junto con inhibidores de la integrasa (ej. Raltegravir) según el peso y edad gestacional del neonato[cite: 3].</li>
+        </ul>
+
+        <h2>Cuidado Preconcepcional y Profilaxis</h2>
+        <p>La intervención más eficaz contra el VIH congénito comienza antes del embarazo[cite: 3].</p>
+        <ul>
+            <li><strong>Atención integral:</strong> La prevención óptima de la transmisión perinatal requiere integrar la planificación familiar, el cuidado preconcepcional y la optimización del tratamiento del VIH antes de la concepción[cite: 3].</li>
+            <li><strong>Profilaxis Pre-Exposición (PrEP):</strong> Las directrices clínicas actuales recomiendan el uso de profilaxis pre-exposición (PrEP) para prevenir la adquisición del virus en personas con potencial de gestación durante los periodos de periconcepción, embarazo y posparto, cuando sus parejas son portadoras del virus[cite: 3].</li>
+            <li><strong>Continuidad del tratamiento:</strong> Se enfatiza que el inicio temprano del TAR y la mantención de la atención médica entre embarazos sucesivos son componentes críticos para lograr la supresión viral materna y proteger al recién nacido[cite: 3].</li>
+        </ul>
+
+        <h2>Epidemiología y Metas de Eliminación</h2>
+        <p>El control del VIH congénito es una prioridad global de salud pública[cite: 3]. Conocer las metas y los obstáculos epidemiológicos ayuda a entender la importancia del manejo clínico[cite: 3].</p>
+        <ul>
+            <li><strong>Metas de erradicación:</strong> Organismos de salud pública, como los CDC (Centros para el Control y la Prevención de Enfermedades), han establecido el objetivo de eliminar la transmisión perinatal del VIH[cite: 3]. Esto se define estadísticamente como una incidencia menor a 1 infección por cada 100,000 nacidos vivos, y una tasa de transmisión inferior al 1% entre los lactantes expuestos[cite: 3].</li>
+            <li><strong>Causas de transmisión persistente:</strong> A pesar de la disponibilidad de tratamientos, siguen ocurriendo casos de VIH congénito[cite: 3]. Los análisis de causa raíz identifican como principales obstáculos el ingreso tardío de la madre al cuidado prenatal y los desafíos en la adherencia al tratamiento antirretroviral (TAR) durante el embarazo[cite: 3].</li>
+            <li><strong>El riesgo residual en la lactancia:</strong> Aunque una madre mantenga un tratamiento antirretroviral estricto y logre una carga viral indetectable (menos de 50 copias/mL) durante el embarazo y el posparto, existe un riesgo residual de transmisión posnatal a través de la leche materna que puede llegar hasta el 1%[cite: 3].</li>
+        </ul>
+    </div>
+
+    <!-- Pestaña 6: Minijuego Arcade -->
+    <div id="tab6" class="tab-content">
+        <h2>ARCADE QUIZ: RETO INMUNOLÓGICO</h2>
+        <div id="game-board">
+            <div id="score-display">PUNTAJE: 0 | VIDAS: 3</div>
+            <div id="question-text" style="font-size: 26px; margin-bottom: 20px;">Presiona START para iniciar la evaluación microbiológica.</div>
+            <div id="options-container">
+                <button class="game-btn" onclick="startGame()">START GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 7: Referencias -->
+    <div id="tab7" class="tab-content">
+        <h2>Referencias Bibliográficas</h2>
+        <ul>
+            <li>León-Leal, J.A. (2014). La infección por VIH en la infancia y la adolescencia. Pediatría Integral. Enlace[cite: 3]</li>
+            <li>MedlinePlus. (s.f.). VIH/sida en las mujeres embarazadas y en los bebés. Biblioteca Nacional de Medicina de EE. UU. Enlace[cite: 3]</li>
+            <li>Panel on Antiretroviral Therapy and Medical Management of Children Living with HIV. (s.f.). Congenital HIV. NCBI Bookshelf ID: NBK565879. Enlace[cite: 3]</li>
+            <li>Clinical Info HIV.GOV. (2026, 31 de marzo). Perinatal Guidelines - Introduction. Departamento de Salud y Servicios Humanos de EE. UU. (HHS). Extraído de las directrices sobre prevención de transmisión perinatal[cite: 3].</li>
+            <li>Panel on Antiretroviral Therapy and Medical Management of Children Living with HIV. (2026, 25 de junio). Diagnosis of HIV Infection in Infants and Children. National Institutes of Health (NIH) / Clinical Info. Extraído de los algoritmos de diagnóstico virológico pediátrico[cite: 3].</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    // Sistema de Pestañas
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // Minijuego Arcade en JS
+    const questions = [
+        {
+            q: "¿Qué enzima convierte el ARN viral en ADN de doble cadena?",
+            options: ["A) Integrasa", "B) Transcriptasa Reversa", "C) Proteasa"],
+            ans: 1
+        },
+        {
+            q: "¿Por qué el test ELISA de 4ta generación no sirve para diagnosticar menores de 18 meses?",
+            options: ["A) Por los linfocitos inmaduros", "B) Por el bajo peso al nacer", "C) Por la persistencia de IgG maternos"],
+            ans: 2
+        },
+        {
+            q: "Técnica virológica de elección que detecta el genoma integrado en los leucocitos:",
+            options: ["A) PCR para ADN Proviral", "B) Detección de Antígeno p24", "C) PCR para ARN Viral"],
+            ans: 0
+        },
+        {
+            q: "Para excluir el VIH en un lactante no amamantado, ¿cuántas pruebas virológicas negativas se requieren?",
+            options: ["A) Una a los 14 días", "B) Dos (al 1er y 4to mes)", "C) Tres consecutivas"],
+            ans: 1
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let lives = 3;
+
+    function startGame() {
+        currentQ = 0;
+        score = 0;
+        lives = 3;
+        updateScoreBoard();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQ >= questions.length) {
+            gameWin();
+            return;
+        }
+        if (lives <= 0) {
+            gameOver();
+            return;
+        }
+
+        const qData = questions[currentQ];
+        document.getElementById("question-text").innerText = qData.q;
+        
+        let optionsHTML = "";
+        for (let i = 0; i < qData.options.length; i++) {
+            optionsHTML += `<button class="game-btn" onclick="checkAnswer(${i})">${qData.options[i]}</button>`;
+        }
+        document.getElementById("options-container").innerHTML = optionsHTML;
+    }
+
+    function checkAnswer(selectedIndex) {
+        if (selectedIndex === questions[currentQ].ans) {
+            score += 100;
+        } else {
+            lives--;
+        }
+        updateScoreBoard();
+        currentQ++;
+        loadQuestion();
+    }
+
+    function updateScoreBoard() {
+        document.getElementById("score-display").innerText = `PUNTAJE: ${score} | VIDAS: ${lives}`;
+    }
+
+    function gameOver() {
+        document.getElementById("question-text").innerText = "GAME OVER. Revisar protocolos de laboratorio.";
+        document.getElementById("question-text").style.color = "red";
+        document.getElementById("options-container").innerHTML = `<button class="game-btn" onclick="resetUI()">REINTENTAR</button>`;
+    }
+
+    function gameWin() {
+        document.getElementById("question-text").innerText = "¡NIVEL COMPLETADO! Dominas el algoritmo pediátrico.";
+        document.getElementById("question-text").style.color = "lime";
+        document.getElementById("options-container").innerHTML = `<button class="game-btn" onclick="resetUI()">JUGAR DE NUEVO</button>`;
+    }
+
+    function resetUI() {
+        document.getElementById("question-text").style.color = "var(--text-color)";
+        startGame();
+    }
+</script>
+
+</body>
+</html>
